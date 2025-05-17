@@ -1,34 +1,40 @@
 name: Consumer Contract Test & Publish
-
 on:
   push:
     branches: [main]
-
 jobs:
   test-and-publish:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: pact-consumer-example
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
+      
       - name: Install dependencies
         run: npm ci
-
+      
       - name: Run consumer pact tests
         run: npm test
-
+      
+      - name: Check directory structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of pacts directory (if exists):"
+          ls -la pacts || echo "pacts directory does not exist"
+      
       - name: Publish pact to broker
         run: |
-          npx pact publish pacts \
+          # Try with the full package path
+          npx @pact-foundation/pact-cli publish pacts \
             --consumer-app-version $GITHUB_SHA \
             --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
             --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
