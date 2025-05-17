@@ -5,6 +5,9 @@ on:
 jobs:
   verify-contract:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pact-provider-example
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -15,74 +18,24 @@ jobs:
           node-version: 18
       
       - name: Install dependencies
-        working-directory: pact-provider-example
         run: npm ci
       
-      - name: Install Pact Core
-        working-directory: pact-provider-example
-        run: npm install @pact-foundation/pact
+      - name: Install Pact CLI explicitly
+        run: npm install @pact-foundation/pact-cli
       
       - name: Start provider
-        working-directory: pact-provider-example
         run: |
           nohup node provider.js &
           sleep 5
       
-      - name: Diagnostic - Check Available Commands
+      - name: Verify pact from broker
         working-directory: pact-provider-example
         run: |
-          echo "Checking for pact-node binaries:"
-          find ./node_modules -name "pact-*" -type f | grep bin
-          echo "Checking for scripts in package.json:"
-          cat package.json | grep -A 10 \"scripts\"
-      
-      - name: Verify using pact-node verify
-        working-directory: pact-provider-example
-        run: |
-          npx pact-node verify \
-            --providerBaseUrl="http://localhost:8081" \
-            --pactBrokerUrl="${{ secrets.PACT_BROKER_BASE_URL }}" \
-            --pactBrokerToken="${{ secrets.PACT_BROKER_TOKEN }}" \
-            --providerVersion="$GITHUB_SHA" \
-            --providerName="UserService" \
-            --publishVerificationResults=true \
-            --enablePending=true
-        continue-on-error: true
-      
-      - name: Install pact-ruby-standalone
-        if: ${{ failure() }}
-        run: |
-          wget https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v1.91.0/pact-1.91.0-linux-x86_64.tar.gz
-          tar xzf pact-1.91.0-linux-x86_64.tar.gz
-      
-      - name: Verify using pact-ruby-standalone
-        if: ${{ failure() }}
-        run: |
-          ./pact/bin/pact-provider-verifier \
-            --provider-base-url=http://localhost:8081 \
-            --pact-broker-base-url=${{ secrets.PACT_BROKER_BASE_URL }} \
-            --pact-broker-token=${{ secrets.PACT_BROKER_TOKEN }} \
-            --provider-version=$GITHUB_SHA \
-            --provider=UserService \
+          ./node_modules/.bin/pact-broker verify \
+            --provider-base-url http://localhost:8081 \
+            --broker-url ${{ secrets.PACT_BROKER_BASE_URL }} \
+            --broker-token ${{ secrets.PACT_BROKER_TOKEN }} \
+            --provider-version $GITHUB_SHA \
+            --provider UserService \
             --publish-verification-results \
             --enable-pending
-      
-      - name: Try with @pact-foundation/pact-core
-        if: ${{ failure() }}
-        working-directory: pact-provider-example
-        run: |
-          npm install @pact-foundation/pact-core
-          npx pact-node verify --help || echo "verify command not found in pact-node"
-          echo "Checking available binaries after installing pact-core:"
-          find ./node_modules/.bin -name "pact*"
-          # Try with different command format
-          if [ -f "./node_modules/.bin/pact-provider-verifier" ]; then
-            ./node_modules/.bin/pact-provider-verifier \
-              --provider-base-url=http://localhost:8081 \
-              --pact-broker-base-url=${{ secrets.PACT_BROKER_BASE_URL }} \
-              --pact-broker-token=${{ secrets.PACT_BROKER_TOKEN }} \
-              --provider-version=$GITHUB_SHA \
-              --provider=UserService \
-              --publish-verification-results \
-              --enable-pending
-          fi
