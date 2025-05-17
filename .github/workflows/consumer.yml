@@ -7,6 +7,10 @@ on:
 jobs:
   test-and-publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pact-consumer-example
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -17,19 +21,14 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        working-directory: pact-consumer-example
         run: npm ci
 
       - name: Run consumer pact tests
-        working-directory: pact-consumer-example
-        run: DEBUG=pact* npm test
+        run: npm test
 
       - name: Publish pact to broker
-        working-directory: pact-consumer-example
         run: |
           npx pact publish pacts \
             --consumer-app-version $GITHUB_SHA \
             --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
             --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
-
-

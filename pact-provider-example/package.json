@@ -11,6 +11,7 @@
   "description": "",
   "devDependencies": {
     "@pact-foundation/pact": "^15.0.1",
+    "@pact-foundation/pact-cli": "^16.0.7",
     "@pact-foundation/pact-node": "^10.18.0",
     "express": "^5.1.0"
   }
