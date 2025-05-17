@@ -25,9 +25,11 @@ jobs:
         run: DEBUG=pact* npm test
 
       - name: Publish pact to broker
+        working-directory: pact-consumer-example
         run: |
           npx pact publish pacts \
             --consumer-app-version $GITHUB_SHA \
             --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
             --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
+
 
