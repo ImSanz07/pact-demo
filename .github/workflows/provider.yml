@@ -18,14 +18,17 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
+        working-directory: pact-provider-example
         run: npm ci
 
       - name: Start provider
+        working-directory: pact-provider-example
         run: |
           nohup node provider.js &
           sleep 5
 
       - name: Verify pact from broker
+        working-directory: pact-provider-example
         run: |
           npx pact-broker verify \
             --provider UserService \

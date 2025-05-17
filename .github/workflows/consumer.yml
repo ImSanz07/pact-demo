@@ -17,12 +17,15 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
+        working-directory: pact-consumer-example
         run: npm ci
 
       - name: Run consumer pact tests
+        working-directory: pact-consumer-example
         run: npm test
 
       - name: Publish pact to broker
+        working-directory: pact-consumer-example
         run: |
           npx pact-broker publish pacts \
             --consumer-app-version $GITHUB_SHA \
