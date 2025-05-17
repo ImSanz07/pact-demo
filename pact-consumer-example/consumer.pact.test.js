@@ -20,9 +20,13 @@ const getUser = (id) =>
 
 // Pact test
 describe("Pact with UserService", () => {
-    beforeAll(() => provider.setup());
+    beforeAll(async () => {
+        await provider.setup();
+    });
 
-    afterAll(() => provider.finalize());
+    afterAll(async () => {
+        await provider.finalize();
+    });
 
     describe("when a call to GET /user/1 is made", () => {
         beforeAll(() => {
@@ -54,7 +58,9 @@ describe("Pact with UserService", () => {
             });
         });
 
-        // Verify Pact
-        afterEach(() => provider.verify());
+        afterEach(async () => {
+            await provider.verify();
+        });
     });
 });
+
