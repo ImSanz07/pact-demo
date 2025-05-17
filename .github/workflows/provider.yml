@@ -28,13 +28,13 @@ jobs:
           sleep 5
 
       - name: Verify pact from broker
-        working-directory: pact-provider-example
         run: |
-          npx pact-broker verify \
-            --provider UserService \
+          npx pact-provider-verifier \
             --provider-base-url http://localhost:8081 \
-            --provider-version $GITHUB_SHA \
-            --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
+            --broker-url ${{ secrets.PACT_BROKER_BASE_URL }} \
             --broker-token ${{ secrets.PACT_BROKER_TOKEN }} \
+            --provider-version $GITHUB_SHA \
+            --provider UserService \
             --publish-verification-results \
             --enable-pending
+

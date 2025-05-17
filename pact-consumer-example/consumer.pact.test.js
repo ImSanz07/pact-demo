@@ -25,6 +25,7 @@ describe("Pact with UserService", () => {
     });
 
     afterAll(async () => {
+        await provider.verify();
         await provider.finalize();
     });
 
@@ -44,8 +45,8 @@ describe("Pact with UserService", () => {
                         id: 1,
                         name: "Alice",
                         email: "alice@example.com"
-                    })
-                }
+                    }),
+                },
             });
         });
 
@@ -56,10 +57,6 @@ describe("Pact with UserService", () => {
                 name: "Alice",
                 email: "alice@example.com"
             });
-        });
-
-        afterEach(async () => {
-            await provider.verify();
         });
     });
 });
