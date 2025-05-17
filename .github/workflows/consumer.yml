@@ -22,7 +22,7 @@ jobs:
 
       - name: Run consumer pact tests
         working-directory: pact-consumer-example
-        run: npm test
+        run: DEBUG=pact* npm test
 
       - name: Publish pact to broker
         working-directory: pact-consumer-example

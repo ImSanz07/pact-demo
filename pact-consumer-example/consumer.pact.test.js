@@ -9,6 +9,7 @@ const provider = new Pact({
     consumer: "UserApp",         // Name of the consumer
     provider: "UserService",     // Name of the provider
     port: 1234,
+    host: "127.0.0.1",
     log: path.resolve(process.cwd(), "logs", "pact.log"),
     dir: path.resolve(process.cwd(), "pacts"),
     logLevel: "INFO"
@@ -16,7 +17,8 @@ const provider = new Pact({
 
 // Consumer function to test
 const getUser = (id) =>
-    axios.get(`http://localhost:1234/user/${id}`).then(res => res.data);
+    axios.get(`http://127.0.0.1:1234/user/${id}`).then(res => res.data);
+
 
 // Pact test
 describe("Pact with UserService", () => {
